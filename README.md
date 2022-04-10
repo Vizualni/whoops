@@ -65,8 +65,12 @@ func process() error {
 func caller() {
 	err := process()
 	if err != nil {
-		if query, ok := ErrFieldQuery.GetFrom(err); ok {
-			log.Error("error %s with query: %s", err, query)	
+		var (
+			query yourpackage.Query
+			ok bool
+		)
+		if query, ok = ErrFieldQuery.GetFrom(err); ok {
+			log.Error("error %s with query: %s", err, query.YourMethodThatReturnsQueryThatWasUsed())	
 			// ...
 		}
 	}
