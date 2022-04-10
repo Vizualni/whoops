@@ -28,14 +28,11 @@ import "github.com/vizualni/whoops"
 const ErrPayloadSizeTooLarge = whoops.Errorf("payload size too large. got %d bytes")
 
 // ...
-
 return ErrPayloadSizeTooLarge.Format(len(payload))
 
 
 // later in code you can do
-
 var err error
-
 if whoops.Is(err, ErrPayloadSizeTooLarge) {
 	// do your thing
 }
@@ -76,7 +73,5 @@ func caller() {
 	}
 	// ...
 }
-
-return ErrPayloadSizeTooLarge.Format(len(payload))
 ```
 
