@@ -44,7 +44,7 @@ See example below to get the idea behind the `Errorf` type of error.
 
 ```go
 import "github.com/vizualni/whoops"
-const ErrPayloadSizeTooLarge = whoops.Errorf("payload size too large. got %d bytes")
+const ErrPayloadSizeTooLarge = whoops.Errorf("payload size too big. got %d bytes")
 
 // ...
 return ErrPayloadSizeTooLarge.Format(len(payload))
@@ -61,6 +61,7 @@ if whoops.Is(err, ErrPayloadSizeTooLarge) {
 ## Wrap errors with custom fields
 
 Enrich your errors with extra information. e.g. logging the query that failed without query string going into the error message making it unreadable.
+It uses Go 1.18 generic's feature to ensure type safety for the fields.
 
 ```go
 import "yourpackage"
