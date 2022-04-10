@@ -141,3 +141,52 @@ groupErr.Add(ErrBad2.Format("foobar"))
 whoops.Is(groupErr, ErrBad1) // returns true
 whoops.Is(groupErr, ErrBad2) // returns true
 ```
+
+## Wrapping errors
+
+Wrapping is very much alike like grouping but it's mostly better for only wrapping two errors together.
+
+```go
+import "github.com/vizualni/whoops"
+const (
+	ErrUnableToIncrementCounter = whoops.String("unable to increment counter")
+)
+
+func incrementUserCounter(id int) error {
+	// ...
+	err := incrementCounterForUser(id)
+	if err != nil {
+	   return whoops.Wrap(err, ErrUnableToIncrementCounter)
+	}
+	// ...
+}
+```
+
+## Errors with stacktrace
+
+All error types have method called `Trace`, which called, taked the current stack trace and creates a new error with the stack trace attached.
+This makes things easier for debugging.
+
+```go
+import "github.com/vizualni/whoops"
+const (
+	ErrFoo = whoops.String("foo")
+	ErrBar = whoops.Errorf("hello: %s")
+)
+
+func bar() error {
+	// ...
+	if err != nil {
+	   return whoops.Trace(err)
+	}
+	// or
+	return ErrFoo.Trace()
+	// or
+	return ErrBar.Format("Alice").Trace()
+	// or
+	return Group{ErrFoo, ErrBar.Format("Bob")}.Trace()
+	// or
+	return Wrap(ErrFoo, ErrBar.Format("Bob")).Trace()
+	// ...
+}
+```
