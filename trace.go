@@ -20,6 +20,9 @@ func Trace(err error) error {
 }
 
 func trace(err error, skip int) error {
+	if err == nil {
+		return nil
+	}
 	var frames []runtime.Frame
 	for i := skip; i < 1000; i++ {
 		frame, ok := getFrame(i)
