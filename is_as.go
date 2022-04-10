@@ -9,3 +9,7 @@ func Is(err, target error) bool {
 func As(err error, target any) bool {
 	return errors.As(err, target)
 }
+
+func Unwrap(err error) error {
+	return errors.Unwrap(err)
+}

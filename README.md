@@ -75,3 +75,44 @@ func caller() {
 }
 ```
 
+
+## Grouping errors
+
+### Example 1
+
+```go
+import "github.com/vizualni/whoops"
+
+func foo() error {
+	var groupErr whoops.Group
+
+	// processN function returns an error only (can return nil as well)
+	groupErr.Add(proces1()) 
+	groupErr.Add(proces2()) 
+	groupErr.Add(proces3()) 
+
+	if groupErr.Err() {
+		return groupErr
+	}
+	// success
+	return nil
+}
+```
+
+### Example 2
+
+```go
+import "github.com/vizualni/whoops"
+const (
+	ErrBad1 = whoops.String("something bad has happened")
+	ErrBad2 = whoops.Errorf("format this: %s")
+)
+
+// ...
+var groupErr whoops.Group
+groupErr.Add(ErrBad1) 
+groupErr.Add(ErrBad2.Format("foobar")) 
+
+whoops.Is(groupErr, ErrBad1) // returns true
+whoops.Is(groupErr, ErrBad2) // returns true
+```
