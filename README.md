@@ -58,7 +58,7 @@ if whoops.Is(err, ErrPayloadSizeTooLarge) {
 ```
 
 
-## Wrap errors with custom fields
+## Enrich errors with custom fields
 
 Enrich your errors with extra information. e.g. logging the query that failed without query string going into the error message making it unreadable.
 It uses Go 1.18 generic's feature to ensure type safety for the fields.
@@ -77,7 +77,7 @@ func process() error {
 		query yourpackage.Query
 	)
 	// ...
-	return whoops.Wrap(err, ErrFieldUser.Val(user), ErrFieldQuery.Val(query))
+	return whoops.Enrich(err, ErrFieldUser.Val(user), ErrFieldQuery.Val(query))
 }
 
 // not the best example, but you get the picture

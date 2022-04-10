@@ -9,7 +9,7 @@ type testStruct struct {
 	B int
 }
 
-func TestFieldsWrapping(t *testing.T) {
+func TestErrorEnrichingWithFields(t *testing.T) {
 	var (
 		f1 Field[string]     = "field1"
 		f2 Field[testStruct] = "field2"
@@ -21,44 +21,44 @@ func TestFieldsWrapping(t *testing.T) {
 			B: 2,
 		}
 
-		we wrapperErrorWithFields
+		enrichedErr enrichedErrorWithFields
 	)
 
 	anyErr := errors.New("any error")
 
-	t.Run("Wrap wraps an error", func(t *testing.T) {
-		we = Wrap(anyErr, f1.Val("random value"), f2.Val(ts))
-		_, isErr := any(we).(error)
+	t.Run("Enrich enriches an error", func(t *testing.T) {
+		enrichedErr = Enrich(anyErr, f1.Val("random value"), f2.Val(ts))
+		_, isErr := any(enrichedErr).(error)
 		assert.True(t, isErr)
 	})
 
 	t.Run("ensure that fields can get extracted", func(t *testing.T) {
-		extractedField1, found := f1.GetFrom(we)
+		extractedField1, found := f1.GetFrom(enrichedErr)
 		assert.True(t, found)
 		assert.Equal(t, "random value", extractedField1)
 
-		extractedField2, found := f2.GetFrom(we)
+		extractedField2, found := f2.GetFrom(enrichedErr)
 		assert.True(t, found)
 		assert.Equal(t, ts, extractedField2)
 
-		_, found = f3.GetFrom(we)
+		_, found = f3.GetFrom(enrichedErr)
 		assert.False(t, found)
 	})
 
-	newWe := Wrap(we, f4.Val(true))
+	newEnriched := Enrich(enrichedErr, f4.Val(true))
 
-	t.Run("wrapping a wrapped error", func(t *testing.T) {
+	t.Run("enriching an enriched error", func(t *testing.T) {
 		// f1, f2 and f4 must exist on newWe
 		var ok bool
-		_, ok = f1.GetFrom(newWe)
+		_, ok = f1.GetFrom(newEnriched)
 		assert.True(t, ok)
-		_, ok = f2.GetFrom(newWe)
+		_, ok = f2.GetFrom(newEnriched)
 		assert.True(t, ok)
-		_, ok = f4.GetFrom(newWe)
+		_, ok = f4.GetFrom(newEnriched)
 		assert.True(t, ok)
 
 		// f4 does not exist on old we
-		v, ok := f4.GetFrom(we)
+		v, ok := f4.GetFrom(enrichedErr)
 		assert.False(t, ok)
 		assert.False(t, v)
 	})

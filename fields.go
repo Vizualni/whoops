@@ -15,11 +15,11 @@ func (f Field[T]) Val(v T) wrappedValue[T] {
 }
 
 func (f Field[T]) GetFrom(err error) (val T, found bool) {
-	var we wrapperErrorWithFields
+	var enrichedErr enrichedErrorWithFields
 
 	for ; err != nil; err = Unwrap(err) {
-		if As(err, &we) {
-			for _, field := range we.fields {
+		if As(err, &enrichedErr) {
+			for _, field := range enrichedErr.fields {
 				ff, ok := field.(wrappedValue[T])
 				if !ok {
 					continue
@@ -35,35 +35,35 @@ func (f Field[T]) GetFrom(err error) (val T, found bool) {
 	return val, false
 }
 
-func (w wrappedValue[T]) wrap(err *wrapperErrorWithFields) {
+func (w wrappedValue[T]) enrich(err *enrichedErrorWithFields) {
 	err.fields = append(err.fields, w)
 }
 
-type wrapper interface {
-	wrap(err *wrapperErrorWithFields)
+type enricher interface {
+	enrich(err *enrichedErrorWithFields)
 }
 
-type wrapperErrorWithFields struct {
+type enrichedErrorWithFields struct {
 	err    error
 	fields []any
 }
 
-func (we wrapperErrorWithFields) Error() string {
-	return we.err.Error()
+func (enrichedErr enrichedErrorWithFields) Error() string {
+	return enrichedErr.err.Error()
 }
 
-func (we wrapperErrorWithFields) Unwrap() error {
-	return we.err
+func (enrichedErr enrichedErrorWithFields) Unwrap() error {
+	return enrichedErr.err
 }
 
-func Wrap(err error, fields ...wrapper) wrapperErrorWithFields {
-	we := wrapperErrorWithFields{
+func Enrich(err error, fields ...enricher) enrichedErrorWithFields {
+	enrichedErr := enrichedErrorWithFields{
 		err:    err,
 		fields: make([]any, 0, len(fields)),
 	}
 	for _, field := range fields {
-		field.wrap(&we)
+		field.enrich(&enrichedErr)
 	}
 
-	return we
+	return enrichedErr
 }
