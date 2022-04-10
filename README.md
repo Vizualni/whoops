@@ -2,6 +2,8 @@
 
 ![whoops logo](./whoops.png)
 
+_Logo inspired by the Awkward Look Monkey Puppet meme_.
+
 -----
 
 Whoops is a small helper Go library to help you with errors in Go. I've decided to create this library because I've noticed that I am using basically the same pattern
@@ -11,10 +13,10 @@ all over and I wanted to make a library to help me save some time.
 
 # Error types
 
-The thing that I wanted to avoid was creating package level errors as `vars`. I want to define those as a `const` to ensure that there is no way that somebody is going
-to accidently change it. Thus, most of the errors in whoops package can be created as consts.
 
 ## String
+
+A simple string error that you can define as a constant.
 
 ```go
 import "github.com/vizualni/whoops"
@@ -22,6 +24,23 @@ const ErrTheAfwulThingHasHappened = whoops.String("something bad has happened")
 ```
 
 ## Errorf
+
+An error that can be formatted. It can also be defined as a constant.
+
+Usually, you'd do something like:
+```go
+
+func foo() error {
+	// ...
+	var answer = 42
+	return fmt.Errorf("the answer is: %d", answer)
+}
+```
+
+which would make it harder to use error assertion and you'd most likely end up doing a string comparison with errors to figure out which error has happened, and you'd
+be unable to use `errors.Is` to help you out.
+
+See example below to get the idea behind the `Errorf` type of error.
 
 ```go
 import "github.com/vizualni/whoops"
@@ -40,6 +59,8 @@ if whoops.Is(err, ErrPayloadSizeTooLarge) {
 
 
 ## Wrap errors with custom fields
+
+Enrich your errors with extra information. e.g. logging the query that failed without query string going into the error message making it unreadable.
 
 ```go
 import "yourpackage"
@@ -67,7 +88,8 @@ func caller() {
 			ok bool
 		)
 		if query, ok = ErrFieldQuery.GetFrom(err); ok {
-			log.Error("error %s with query: %s", err, query.YourMethodThatReturnsQueryThatWasUsed())	
+			// log the query that failed
+			log.Error("error %s with query: %s", err, query.Text())	
 			// ...
 		}
 	}
@@ -77,6 +99,8 @@ func caller() {
 
 
 ## Grouping errors
+
+If you are processing many things at once and you want to group all those errors together.
 
 ### Example 1
 
