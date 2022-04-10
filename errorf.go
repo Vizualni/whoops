@@ -20,20 +20,20 @@ func (e formattedError) Is(err error) bool {
 	if errf, ok := err.(Errorf); ok {
 		return e.origErr == errf
 	}
-	ferr, ok := err.(formattedError)
+	errf, ok := err.(formattedError)
 	if !ok {
 		return false
 	}
 
-	if e.origErr != ferr.origErr {
+	if e.origErr != errf.origErr {
 		return false
 	}
-	if len(e.args) != len(ferr.args) {
+	if len(e.args) != len(errf.args) {
 		return false
 	}
 
 	for i := 0; i < len(e.args); i++ {
-		if e.args[i] != ferr.args[i] {
+		if e.args[i] != errf.args[i] {
 			return false
 		}
 	}
