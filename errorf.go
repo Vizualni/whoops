@@ -15,14 +15,10 @@ type formattedError struct {
 	args    []any
 }
 
-func (e formattedError) isErrorf(errf Errorf) bool {
-	return e.origErr == errf
-}
-
 func (e formattedError) Is(err error) bool {
 
 	if errf, ok := err.(Errorf); ok {
-		return e.isErrorf(errf)
+		return e.origErr == errf
 	}
 	ferr, ok := err.(formattedError)
 	if !ok {
