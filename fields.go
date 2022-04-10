@@ -1,9 +1,5 @@
 package whoops
 
-import (
-	"errors"
-)
-
 type Field[T any] string // adding T for type safety
 
 type wrappedValue[T any] struct {
@@ -21,8 +17,8 @@ func (f Field[T]) Val(v T) wrappedValue[T] {
 func (f Field[T]) GetFrom(err error) (val T, found bool) {
 	var we wrapperErrorWithFields
 
-	for ; err != nil; err = errors.Unwrap(err) {
-		if errors.As(err, &we) {
+	for ; err != nil; err = Unwrap(err) {
+		if As(err, &we) {
 			for _, field := range we.fields {
 				ff, ok := field.(wrappedValue[T])
 				if !ok {
