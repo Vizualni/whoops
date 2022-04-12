@@ -1,5 +1,7 @@
 # Whoops!
 
+[![codecov](https://codecov.io/gh/Vizualni/whoops/branch/master/graph/badge.svg?token=RLFQKJFKI6)](https://codecov.io/gh/Vizualni/whoops)
+
 ![whoops logo](./whoops.png)
 
 _Logo inspired by the Awkward Look Monkey Puppet meme_.
