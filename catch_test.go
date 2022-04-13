@@ -8,35 +8,94 @@ import (
 
 func TestCatch(t *testing.T) {
 	const err1 = String("ohai")
-	t.Run("catch returns the returned error", func(t *testing.T) {
-		err := Catch(func() error {
-			return err1
-		})
-		assert.ErrorIs(t, err, err1)
-	})
+	const wrapperErr = String("wrapper")
 
-	t.Run("when calling must from catch it returns that error", func(t *testing.T) {
-		err := Catch(func() error {
+	t.Run("when calling must from catch, it returns that error", func(t *testing.T) {
+		err := Catch(func() {
 			f1 := func() error {
 				return err1
 			}
 			Must1(f1())
-			return nil
 		})
 		assert.ErrorIs(t, err, err1)
 	})
 
 	t.Run("when calling assert it returns the error", func(t *testing.T) {
-		err := Catch(func() error {
+		err := Catch(func() {
 			Assert(err1)
-			return nil
 		})
 		assert.ErrorIs(t, err, err1)
 	})
 
 	t.Run("when something else panics, it raises it", func(t *testing.T) {
 		assert.PanicsWithValue(t, err1, func() {
-			Catch(func() error {
+			Catch(func() {
+				panic(err1)
+			})
+		})
+	})
+
+	t.Run("calling defer wrap wraps the error", func(t *testing.T) {
+		err := Catch(func() {
+			defer DeferWrap(wrapperErr)()
+			Assert(err1)
+		})
+		assert.ErrorIs(t, err, err1)
+		assert.ErrorIs(t, err, wrapperErr)
+	})
+
+	t.Run("calling defer wrap with no error skips it", func(t *testing.T) {
+		err := Catch(func() {
+			defer DeferWrap(wrapperErr)()
+		})
+		assert.NoError(t, err)
+	})
+
+	t.Run("calling defer with custom panic, re-panics the same error", func(t *testing.T) {
+		assert.PanicsWithValue(t, "omg", func() {
+			Catch(func() {
+				defer DeferWrap(wrapperErr)()
+				panic("omg")
+			})
+		})
+	})
+}
+
+func TestCatchVal(t *testing.T) {
+	const err1 = String("ohai")
+
+	t.Run("no error, it returns a value", func(t *testing.T) {
+		val, err := CatchVal(func() int {
+			return 1
+		})
+		assert.NoError(t, err)
+		assert.Equal(t, 1, val)
+	})
+
+	t.Run("when calling must from catch, it returns that error", func(t *testing.T) {
+		val, err := CatchVal(func() int {
+			f1 := func() error {
+				return err1
+			}
+			Must1(f1())
+			return 123 // never gets here
+		})
+		assert.ErrorIs(t, err, err1)
+		assert.Equal(t, 0, val)
+	})
+
+	t.Run("when calling assert it returns the error", func(t *testing.T) {
+		val, err := CatchVal(func() int {
+			Assert(err1)
+			return 0
+		})
+		assert.ErrorIs(t, err, err1)
+		assert.Equal(t, 0, val)
+	})
+
+	t.Run("when something else panics, it raises it", func(t *testing.T) {
+		assert.PanicsWithValue(t, err1, func() {
+			CatchVal(func() bool {
 				panic(err1)
 			})
 		})
