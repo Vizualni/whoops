@@ -4,18 +4,6 @@ type panickedError struct {
 	error
 }
 
-func _catchPanic(orig *error) {
-	recovered := recover()
-	if recovered == nil {
-		return
-	}
-	perr, ok := recovered.(panickedError)
-	if !ok {
-		panic(recovered)
-	}
-	*orig = perr.error
-}
-
 func Catch(fnc func()) (err error) {
 	defer func() {
 		recovered := recover()
