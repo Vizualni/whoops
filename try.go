@@ -4,7 +4,7 @@ type panickedError struct {
 	error
 }
 
-func Catch(fnc func()) (err error) {
+func Try(fnc func()) (err error) {
 	defer func() {
 		recovered := recover()
 		if recovered == nil {
@@ -20,7 +20,7 @@ func Catch(fnc func()) (err error) {
 	return nil
 }
 
-func CatchVal[T any](fnc func() T) (t T, err error) {
+func TryVal[T any](fnc func() T) (t T, err error) {
 	defer func() {
 		recovered := recover()
 		if recovered == nil {

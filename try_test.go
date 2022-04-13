@@ -6,12 +6,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCatch(t *testing.T) {
+func TestTry(t *testing.T) {
 	const err1 = String("ohai")
 	const wrapperErr = String("wrapper")
 
-	t.Run("when calling must from catch, it returns that error", func(t *testing.T) {
-		err := Catch(func() {
+	t.Run("when calling must from try, it returns that error", func(t *testing.T) {
+		err := Try(func() {
 			f1 := func() error {
 				return err1
 			}
@@ -21,7 +21,7 @@ func TestCatch(t *testing.T) {
 	})
 
 	t.Run("when calling assert it returns the error", func(t *testing.T) {
-		err := Catch(func() {
+		err := Try(func() {
 			Assert(err1)
 		})
 		assert.ErrorIs(t, err, err1)
@@ -29,14 +29,14 @@ func TestCatch(t *testing.T) {
 
 	t.Run("when something else panics, it raises it", func(t *testing.T) {
 		assert.PanicsWithValue(t, err1, func() {
-			Catch(func() {
+			Try(func() {
 				panic(err1)
 			})
 		})
 	})
 
 	t.Run("calling defer wrap wraps the error", func(t *testing.T) {
-		err := Catch(func() {
+		err := Try(func() {
 			defer DeferWrap(wrapperErr)()
 			Assert(err1)
 		})
@@ -45,7 +45,7 @@ func TestCatch(t *testing.T) {
 	})
 
 	t.Run("calling defer wrap with no error skips it", func(t *testing.T) {
-		err := Catch(func() {
+		err := Try(func() {
 			defer DeferWrap(wrapperErr)()
 		})
 		assert.NoError(t, err)
@@ -53,7 +53,7 @@ func TestCatch(t *testing.T) {
 
 	t.Run("calling defer with custom panic, re-panics the same error", func(t *testing.T) {
 		assert.PanicsWithValue(t, "omg", func() {
-			Catch(func() {
+			Try(func() {
 				defer DeferWrap(wrapperErr)()
 				panic("omg")
 			})
@@ -61,19 +61,19 @@ func TestCatch(t *testing.T) {
 	})
 }
 
-func TestCatchVal(t *testing.T) {
+func TestTryVal(t *testing.T) {
 	const err1 = String("ohai")
 
 	t.Run("no error, it returns a value", func(t *testing.T) {
-		val, err := CatchVal(func() int {
+		val, err := TryVal(func() int {
 			return 1
 		})
 		assert.NoError(t, err)
 		assert.Equal(t, 1, val)
 	})
 
-	t.Run("when calling must from catch, it returns that error", func(t *testing.T) {
-		val, err := CatchVal(func() int {
+	t.Run("when calling must from try, it returns that error", func(t *testing.T) {
+		val, err := TryVal(func() int {
 			f1 := func() error {
 				return err1
 			}
@@ -85,7 +85,7 @@ func TestCatchVal(t *testing.T) {
 	})
 
 	t.Run("when calling assert it returns the error", func(t *testing.T) {
-		val, err := CatchVal(func() int {
+		val, err := TryVal(func() int {
 			Assert(err1)
 			return 0
 		})
@@ -95,7 +95,7 @@ func TestCatchVal(t *testing.T) {
 
 	t.Run("when something else panics, it raises it", func(t *testing.T) {
 		assert.PanicsWithValue(t, err1, func() {
-			CatchVal(func() bool {
+			TryVal(func() bool {
 				panic(err1)
 			})
 		})

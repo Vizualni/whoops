@@ -224,14 +224,14 @@ bytes = whoops.Must(json.Marshal(myMap))
 
 ## Must1, Must2 && Must3
 
-## Catch
+## Try
 
 ```go
 import "github.com/vizualni/whoops"
 import "json"
 
 // ...
-err := whoops.Catch(func(){
+err := whoops.Try(func(){
 	bytes := whoops.Must(json.Marshal(myMap))
 	bytesWritten := whoops.Must(file.Write(bytes))
 })
@@ -241,5 +241,5 @@ if err != nil {
 
 ```
 
-## CatchVal
+## TryVal
 
