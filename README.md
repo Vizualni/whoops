@@ -243,3 +243,18 @@ if err != nil {
 
 ## TryVal
 
+```go
+import "github.com/vizualni/whoops"
+import "json"
+
+// ...
+n, err := whoops.TryVal(func() int{
+	bytes := whoops.Must(json.Marshal(myMap))
+	bytesWritten := whoops.Must(file.Write(bytes))
+	return bytesWritten
+})
+if err != nil {
+	return err
+}
+
+```
