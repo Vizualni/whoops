@@ -192,3 +192,69 @@ func bar() error {
 	// ...
 }
 ```
+
+
+-----
+
+# if err != nil { return err  }
+
+The idea is not to get rid of `err != nil` but rather to eliminate the need to write it all the time.
+
+
+## Assert
+
+```go
+import "github.com/vizualni/whoops"
+
+err := functionCall()
+whoops.Assert(err) // panics if err is nil and the value that was panicked is the (wrapped) error
+```
+
+## Must
+
+```go
+import "github.com/vizualni/whoops"
+import "json"
+
+var myMap map[string]any
+// ...
+var bytes []byte
+bytes = whoops.Must(json.Marshal(myMap))
+```
+
+## Must1, Must2 && Must3
+
+## Try
+
+```go
+import "github.com/vizualni/whoops"
+import "json"
+
+// ...
+err := whoops.Try(func(){
+	bytes := whoops.Must(json.Marshal(myMap))
+	bytesWritten := whoops.Must(file.Write(bytes))
+})
+if err != nil {
+	return err
+}
+
+```
+
+## TryVal
+
+```go
+import "github.com/vizualni/whoops"
+import "json"
+
+// ...
+n, err := whoops.TryVal(func() int{
+	bytes := whoops.Must(json.Marshal(myMap))
+	bytesWritten := whoops.Must(file.Write(bytes))
+	return bytesWritten
+})
+if err != nil {
+	return err
+}
+
+```
