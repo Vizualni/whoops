@@ -6,9 +6,17 @@ import (
 
 type Errorf string
 
-// Error is fullfilling the error interface only because it's much nicer to
-// use it with the Is method.
-func (Errorf) Error() string { panic("Errorf is not an error you should return") }
+type isableErrorf struct {
+	err Errorf
+}
+
+func (e isableErrorf) Error() string {
+	panic("not an error you should return. use it with errors.Is")
+}
+
+func (e Errorf) CheckIs() error {
+	return isableErrorf{e}
+}
 
 type formattedError struct {
 	origErr Errorf
@@ -17,9 +25,10 @@ type formattedError struct {
 
 func (e formattedError) Is(err error) bool {
 
-	if errf, ok := err.(Errorf); ok {
-		return e.origErr == errf
+	if isErrf, ok := err.(isableErrorf); ok {
+		return e.origErr == isErrf.err
 	}
+
 	errf, ok := err.(formattedError)
 	if !ok {
 		return false

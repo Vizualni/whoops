@@ -29,6 +29,12 @@ func TestGroupInitWithMultipleErrors(t *testing.T) {
 		errors.New("b"),
 	}
 	assert.True(t, err.Err())
+	err = Group{}
+	err.Add(
+		errors.New("c"),
+		errors.New("d"),
+	)
+	assert.True(t, err.Err())
 }
 
 func TestGroupUnwrapping(t *testing.T) {
