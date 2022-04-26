@@ -1,6 +1,6 @@
 # Whoops!
 
-[![codecov](https://codecov.io/gh/Vizualni/whoops/branch/master/graph/badge.svg?token=RLFQKJFKI6)](https://codecov.io/gh/Vizualni/whoops)
+[![codecov](https://codecov.io/gh/Vizualni/whoops/branch/master/graph/badge.svg?token=RLFQKJFKI6)](https://codecov.io/gh/Vizualni/whoops) [![Go Report Card](https://goreportcard.com/badge/github.com/vizualni/whoops)](https://goreportcard.com/report/github.com/vizualni/whoops)
 
 ![whoops logo](./whoops.png)
 
