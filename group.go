@@ -7,12 +7,16 @@ import (
 
 type Group []error
 
-func (g *Group) Add(err error) {
+func (g *Group) Add(errs ...error) {
 	// nil errors are ignored
-	if err == nil {
+	if len(errs) == 0 {
 		return
 	}
-	*g = append(*g, err)
+	for _, err := range errs {
+		if err != nil {
+			*g = append(*g, err)
+		}
+	}
 }
 
 func (g Group) Err() bool {

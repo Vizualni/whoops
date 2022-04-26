@@ -7,12 +7,17 @@ import (
 )
 
 func TestErrorf(t *testing.T) {
-	err1 := Errorf("hello")
-
-	err := err1.Format()
 	t.Run("Errorf generates an error", func(t *testing.T) {
+		err := Errorf("hello").Format()
 		_, ok := any(err).(error)
 		assert.True(t, ok)
+	})
+
+	t.Run("errorf isable error panics", func(t *testing.T) {
+		assert.Panics(t, func() {
+			err := Errorf("bla").CheckIs()
+			err.Error()
+		})
 	})
 
 	t.Run("testing Is", func(t *testing.T) {
@@ -26,6 +31,8 @@ func TestErrorf(t *testing.T) {
 			err21 = errf2.Format("bar", 3)
 			err22 = errf2.Format("foo", 8, 9)
 		)
+
+		assert.ErrorIs(t, err1, errf1.CheckIs())
 
 		assert.False(t, err1.Is(err21))
 		assert.False(t, err1.Is(err22))
