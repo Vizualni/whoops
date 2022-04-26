@@ -13,6 +13,13 @@ func TestErrorf(t *testing.T) {
 		assert.True(t, ok)
 	})
 
+	t.Run("errorf isable error panics", func(t *testing.T) {
+		assert.Panics(t, func() {
+			err := Errorf("bla").CheckIs()
+			err.Error()
+		})
+	})
+
 	t.Run("testing Is", func(t *testing.T) {
 		var (
 			errf1 = Errorf("err: %s")
