@@ -7,6 +7,8 @@ import (
 
 type Group []error
 
+var _ wrapser = Group{}
+
 func (g *Group) Add(errs ...error) {
 	// nil errors are ignored
 	if len(errs) == 0 {
@@ -23,6 +25,13 @@ func (g Group) Err() bool {
 	return len(g) > 0
 }
 
+func (g Group) Return() error {
+	if g.Err() {
+		return g
+	}
+	return nil
+}
+
 func (g Group) Error() string {
 	if len(g) == 0 {
 		return "no errors in the group"
@@ -36,6 +45,19 @@ func (g Group) Error() string {
 	}
 
 	return sb.String()
+}
+
+func (g Group) Unwrap() error {
+	if len(g) == 0 {
+		return nil
+	}
+	return iteratorGroupUnwrapper{
+		g: g[:],
+	}
+}
+
+func (g Group) WrapS(msg string, args ...any) error {
+	return WrapS(g, msg, args...)
 }
 
 type iteratorGroupUnwrapper struct {
@@ -62,14 +84,5 @@ func (i iteratorGroupUnwrapper) Unwrap() error {
 	return iteratorGroupUnwrapper{
 		i: i.i + 1,
 		g: i.g,
-	}
-}
-
-func (g Group) Unwrap() error {
-	if len(g) == 0 {
-		return nil
-	}
-	return iteratorGroupUnwrapper{
-		g: g[:],
 	}
 }

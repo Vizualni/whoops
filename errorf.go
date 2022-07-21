@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+var _ wrapser = formattedError{}
+
 type Errorf string
 
 type isableErrorf struct {
@@ -50,6 +52,10 @@ func (e formattedError) Is(err error) bool {
 	return true
 }
 
+func (e Errorf) Format(args ...any) formattedError {
+	return newFormattedError(e, args...)
+}
+
 func newFormattedError(origErr Errorf, args ...any) formattedError {
 	return formattedError{
 		origErr: origErr,
@@ -61,6 +67,6 @@ func (e formattedError) Error() string {
 	return fmt.Sprintf(string(e.origErr), e.args...)
 }
 
-func (e Errorf) Format(args ...any) formattedError {
-	return newFormattedError(e, args...)
+func (e formattedError) WrapS(msg string, args ...any) error {
+	return WrapS(e, msg, args...)
 }
