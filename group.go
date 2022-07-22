@@ -56,7 +56,7 @@ func (g Group) Unwrap() error {
 	}
 }
 
-func (g Group) WrapS(msg string, args ...any) error {
+func (g Group) WrapS(msg string, args ...any) wraps {
 	return WrapS(g, msg, args...)
 }
 

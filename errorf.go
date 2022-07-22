@@ -4,38 +4,43 @@ import (
 	"fmt"
 )
 
-var _ wrapser = formattedError{}
+var _ wrapser = formattedErrorf{}
 
 type Errorf string
-
-type isableErrorf struct {
-	err Errorf
-}
-
-func (e isableErrorf) Error() string {
-	panic("not an error you should return. use it with errors.Is")
-}
-
-func (e Errorf) CheckIs() error {
-	return isableErrorf{e}
-}
 
 func (e Errorf) Error() string {
 	return fmt.Sprintf("%s - not formatted correctly. Use Format(...) method", string(e))
 }
 
-type formattedError struct {
-	origErr Errorf
-	args    []any
+func (e Errorf) Is(err error) bool {
+	switch w := err.(type) {
+	case Errorf:
+		return w == e
+	case formattedErrorf:
+		return w.Is(e)
+	}
+	return false
 }
 
-func (e formattedError) Is(err error) bool {
+func (e Errorf) Format(args ...any) formattedErrorf {
+	return formattedErrorf{
+		origErr: e,
+		msg:     fmt.Sprintf(string(e), args...),
+	}
+}
 
-	if isErrf, ok := err.(isableErrorf); ok {
-		return e.origErr == isErrf.err
+type formattedErrorf struct {
+	origErr Errorf
+	msg     string
+}
+
+func (e formattedErrorf) Is(err error) bool {
+
+	if orig, ok := err.(Errorf); ok {
+		return e.origErr == orig
 	}
 
-	errf, ok := err.(formattedError)
+	errf, ok := err.(formattedErrorf)
 	if !ok {
 		return false
 	}
@@ -43,34 +48,18 @@ func (e formattedError) Is(err error) bool {
 	if e.origErr != errf.origErr {
 		return false
 	}
-	if len(e.args) != len(errf.args) {
-		return false
-	}
 
-	for i := 0; i < len(e.args); i++ {
-		if e.args[i] != errf.args[i] {
-			return false
-		}
+	if e.msg != errf.msg {
+		return false
 	}
 
 	return true
 }
 
-func (e Errorf) Format(args ...any) formattedError {
-	return newFormattedError(e, args...)
+func (e formattedErrorf) Error() string {
+	return e.msg
 }
 
-func newFormattedError(origErr Errorf, args ...any) formattedError {
-	return formattedError{
-		origErr: origErr,
-		args:    args,
-	}
-}
-
-func (e formattedError) Error() string {
-	return fmt.Sprintf(string(e.origErr), e.args...)
-}
-
-func (e formattedError) WrapS(msg string, args ...any) error {
+func (e formattedErrorf) WrapS(msg string, args ...any) wraps {
 	return WrapS(e, msg, args...)
 }

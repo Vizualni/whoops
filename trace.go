@@ -59,14 +59,19 @@ func (s String) Trace() error {
 	return trace(s, 3)
 }
 
-func (s formattedError) Trace() error {
-	return trace(s, 3)
-}
-
 func (s Group) Trace() error {
 	return trace(s, 3)
 }
+
 func (s wrapper) Trace() error {
+	return trace(s, 3)
+}
+
+func (s wraps) Trace() error {
+	return trace(s, 3)
+}
+
+func (s formattedErrorf) Trace() error {
 	return trace(s, 3)
 }
 

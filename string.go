@@ -7,6 +7,6 @@ var _ wrapser = String("")
 
 func (s String) Error() string { return (string(s)) }
 
-func (s String) WrapS(msg string, args ...any) error {
+func (s String) WrapS(msg string, args ...any) wraps {
 	return WrapS(s, msg, args...)
 }
