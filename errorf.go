@@ -20,6 +20,10 @@ func (e Errorf) CheckIs() error {
 	return isableErrorf{e}
 }
 
+func (e Errorf) Error() string {
+	return fmt.Sprintf("%s - not formatted correctly. Use Format(...) method", string(e))
+}
+
 type formattedError struct {
 	origErr Errorf
 	args    []any
