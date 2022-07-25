@@ -21,15 +21,13 @@ func TestErrorEnrichingWithFields(t *testing.T) {
 			B: 2,
 		}
 
-		enrichedErr enrichedErrorWithFields
+		enrichedErr error
 	)
 
 	anyErr := errors.New("any error")
 
 	t.Run("Enrich enriches an error", func(t *testing.T) {
 		enrichedErr = Enrich(anyErr, f1.Val("random value"), f2.Val(ts))
-		_, isErr := any(enrichedErr).(error)
-		assert.True(t, isErr)
 		assert.Equal(t, "original error: any error\nenriched fields:\nfield1[string] = \"random value\"\nfield2[whoops.testStruct] = whoops.testStruct{A:\"A\", B:2}\n", enrichedErr.Error())
 	})
 

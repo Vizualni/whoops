@@ -77,7 +77,10 @@ func (e enrichedErrorWithFields) Unwrap() error {
 	return e.err
 }
 
-func Enrich(err error, fields ...enricher) enrichedErrorWithFields {
+func Enrich(err error, fields ...enricher) error {
+	if err == nil {
+		return nil
+	}
 	e := enrichedErrorWithFields{
 		err:    err,
 		fields: make([]fmt.Stringer, 0, len(fields)),
