@@ -1,10 +1,22 @@
 package whoops
 
+import (
+	"fmt"
+	"strings"
+)
+
 type Field[T any] string // adding T for type safety
+
+var mm Field[int] = "bla"
 
 type wrappedValue[T any] struct {
 	typ Field[T]
 	val T
+}
+
+func (f wrappedValue[T]) String() string {
+	var a any = f.val
+	return fmt.Sprintf("%s[%T] = %#v", f.typ, f.val, a)
 }
 
 func (f Field[T]) Val(v T) wrappedValue[T] {
@@ -45,25 +57,34 @@ type enricher interface {
 
 type enrichedErrorWithFields struct {
 	err    error
-	fields []any
+	fields []fmt.Stringer
 }
 
-func (enrichedErr enrichedErrorWithFields) Error() string {
-	return enrichedErr.err.Error()
+func (e enrichedErrorWithFields) Error() string {
+	var b strings.Builder
+	b.WriteString("original error: ")
+	b.WriteString(e.err.Error())
+	b.WriteByte('\n')
+	b.WriteString("enriched fields:\n")
+	for _, f := range e.fields {
+		b.WriteString(f.String())
+		b.WriteByte('\n')
+	}
+	return b.String()
 }
 
-func (enrichedErr enrichedErrorWithFields) Unwrap() error {
-	return enrichedErr.err
+func (e enrichedErrorWithFields) Unwrap() error {
+	return e.err
 }
 
 func Enrich(err error, fields ...enricher) enrichedErrorWithFields {
-	enrichedErr := enrichedErrorWithFields{
+	e := enrichedErrorWithFields{
 		err:    err,
-		fields: make([]any, 0, len(fields)),
+		fields: make([]fmt.Stringer, 0, len(fields)),
 	}
 	for _, field := range fields {
-		field.enrich(&enrichedErr)
+		field.enrich(&e)
 	}
 
-	return enrichedErr
+	return e
 }

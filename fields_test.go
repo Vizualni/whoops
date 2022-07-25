@@ -30,6 +30,7 @@ func TestErrorEnrichingWithFields(t *testing.T) {
 		enrichedErr = Enrich(anyErr, f1.Val("random value"), f2.Val(ts))
 		_, isErr := any(enrichedErr).(error)
 		assert.True(t, isErr)
+		assert.Equal(t, "original error: any error\nenriched fields:\nfield1[string] = \"random value\"\nfield2[whoops.testStruct] = whoops.testStruct{A:\"A\", B:2}\n", enrichedErr.Error())
 	})
 
 	t.Run("ensure that fields can get extracted", func(t *testing.T) {
